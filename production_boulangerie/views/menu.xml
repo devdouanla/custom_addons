@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem
+        id="menu_bakery_root"
+        name="Boulangerie"
+        sequence="50"
+    />
+
+    <menuitem
+        id="menu_bakery_catalogue"
+        name="Catalogue"
+        parent="menu_bakery_root"
+        sequence="10"
+    />
+
+    <menuitem
+        id="menu_bakery_products"
+        name="Produits"
+        parent="menu_bakery_catalogue"
+        action="action_bakery_products"
+        sequence="10"
+    />
+
+
+    <menuitem id="menu_production_production"
+              name="Productions"
+              parent="menu_bakery_catalogue"
+              action="action_production_production"
+              sequence="6"/>
+    <menuitem id="menu_production_day"
+              name="Journées de Production"
+              parent="menu_bakery_catalogue"
+              action="action_production_day"
+              sequence="7"/>
+    
+</odoo>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Menu racine -->
+    <menuitem id="menu_bakery_production_root"
+              name="Production"
+              sequence="50"
+              groups="group_production_user,group_production_manager"
+              web_icon="bakery_production,static/description/icon.png"/>
+
+    <!-- Menu principal -->
+    <menuitem id="menu_bakery_production_main"
+              name="Productions"
+              parent="menu_bakery_production_root"
+              sequence="10"/>
+
+    <!-- Sous-menu : liste des productions -->
+    <menuitem id="menu_bakery_production_list"
+              name="Toutes les productions"
+              parent="menu_bakery_production_main"
+              action="action_production_production"
+              sequence="10"
+              groups="group_production_user,group_production_manager"/>
+
+</odoo>

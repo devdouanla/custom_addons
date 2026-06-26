@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ============================== -->
+    <!-- VUE FORMULAIRE view_product_template_bakery_form -->
+    <!-- ============================== -->
+    <record id="view_production_template_production_form" model="ir.ui.view">
+        <field name="name">production.production.form</field>
+        <field name="model">production.production</field>
+        <field name="arch" type="xml">
+            <form string="Production Boulangerie">
+                <!--<header>
+                                <button name="action_validate" type="object" string="Valider"
+                                        class="oe_highlight" invisible="state != 'draft'"/>
+                                <button name="action_cancel" type="object" string="Annuler"
+                                        invisible="state == 'done'"/>
+                                <button name="action_reset_draft" type="object" string="Remettre en brouillon"
+                                        invisible="state != 'cancelled'"/>
+                                <field name="state" widget="statusbar" statusbar_visible="draft,done"/>
+                            </header>-->
+
+                <!-- <sheet> ... partie commentée -->
+                <sheet>
+                <div class="oe_title">
+                    <h1>
+                        <field string="Référence" name="name" readonly="1"/>
+                    </h1>
+                </div>
+</sheet>
+                <!-- Le reste de la structure (group, notebook, etc.) est commenté ci-dessous -->
+
+            </form>
+        </field>
+    </record>
+
+    <!-- ============================== -->
+    <!-- VUE LISTE -->
+    <!-- ============================== -->
+    <!-- <record id="view_production_template_production_list" model="ir.ui.view">
+        <field name="name">production.production.list</field>
+        <field name="model">production.production</field>
+        <field name="arch" type="xml">
+            <list string="Productions">
+                <field name="name"/>
+                <field name="production_value"/>
+                <field name="consumption_cost"/>
+                <field name="profit"/>
+                <field name="profit_rate" widget="percentage"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'done'"
+                       decoration-danger="state == 'cancelled'"
+                       decoration-info="state == 'draft'"/>
+            </list>
+                    </field>
+    </record>
+    -->
+
+    <!-- ============================== -->
+    <!-- VUE RECHERCHE -->
+    <!-- ============================== -->
+    <!--<record id="view_production_template_production_search" model="ir.ui.view">
+        <field name="name">production.production.search</field>
+        <field name="model">production.production</field>
+        <field name="arch" type="xml">
+            <search string="Rechercher Production">
+                <field name="name"/>
+                <field name="farine_product_id"/>
+                <filter string="Brouillon" name="filter_draft" domain="[('state','=','draft')]"/>
+                <filter string="Validé" name="filter_done" domain="[('state','=','done')]"/>
+                <filter string="Annulé" name="filter_cancelled" domain="[('state','=','cancelled')]"/>
+                <separator/>
+                <filter string="État" name="group_state" context="{'group_by':'state'}"/>
+            </search>
+        </field>
+    </record>-->
+
+    <!-- ============================== -->
+    <!-- ACTION -->
+    <!-- ============================== -->
+    <record id="action_production_production" model="ir.actions.act_window">
+        <field name="name">Productions</field>
+        <field name="res_model">production.production</field>
+        <field name="view_mode">form</field>
+        <!--<field name="search_view_id" ref="view_production_template_production_search"/>-->
+    </record>
+
+</odoo>

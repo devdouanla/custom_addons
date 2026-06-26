@@ -1,0 +1,25 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_production_sheet_user,production.sheet user,production_boulangerie.model_production_sheet,base.group_user,1,1,1,0
+access_production_sheet_manager,production.sheet manager,production_boulangerie.model_production_sheet,base.group_system,1,1,1,1
+
+access_production_sheet_user,production.sheet user,production_boulangerie.model_production_sheet,base.group_user,1,1,1,0
+access_production_sheet_manager,production.sheet manager,production_boulangerie.model_production_sheet,base.group_system,1,1,1,1
+
+access_production_consumption_user,production.consumption user,production_boulangerie.model_production_consumption,base.group_user,1,1,1,0
+access_production_consumption_manager,production.consumption manager,production_boulangerie.model_production_consumption,base.group_system,1,1,1,1
+
+access_production_consumption_line_user,production.consumption.line user,production_boulangerie.model_production_consumption_line,base.group_user,1,1,1,0
+access_production_consumption_line_manager,production.consumption.line manager,production_boulangerie.model_production_consumption_line,base.group_system,1,1,1,1
+
+access_production_sheet_line_user,production.sheet.line user,production_boulangerie.model_production_sheet_line,base.group_user,1,1,1,0
+access_production_sheet_line_manager,production.sheet.line manager,production_boulangerie.model_production_sheet_line,base.group_system,1,1,1,1
+
+access_production_production_user,production.production user,production_boulangerie.model_production_production,base.group_user,1,1,1,0
+access_production_production_manager,production.production manager,production_boulangerie.model_production_production,base.group_system,1,1,1,1
+
+access_production_day_user,production.day user,production_boulangerie.model_production_day,base.group_user,1,1,1,0
+access_production_day_manager,production.day manager,production_boulangerie.model_production_day,base.group_system,1,1,1,1
+access_type_production_user,production.type user,production_boulangerie.model_type_production,base.group_user,1,1,1,0
+access_type_production_manager,production.type manager,production_boulangerie.model_type_production,base.group_system,1,1,1,1
+access_production_sheet.line_user,production.sheet.line user,production_boulangerie.model_production_sheet_line,base.group_user,1,1,1,0
+access_production_sheet.line_manager,production.sheet.line manager,production_boulangerie.model_production_sheet_line,base.group_system,1,1,1,1
