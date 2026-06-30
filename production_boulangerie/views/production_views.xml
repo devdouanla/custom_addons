@@ -100,7 +100,7 @@
 <field name="arch" type="xml">
 <list string="Productions" decoration-success="state == 'done'" decoration-muted="state == 'cancelled'" decoration-info="state == 'draft'">
 <field name="name" string="Reference"/>
-<field name="production_day_id" string="Jour de production"/>
+<field name="production_date" string="Jour de production"/>
 <field name="responsable_id" string="Responsable"/>
 <field name="production_value" string="Valeur prod." widget="monetary" options="{'currency_field': 'currency_id'}"/>
 <field name="consumption_cost" string="Cout MP" widget="monetary" options="{'currency_field': 'currency_id'}"/>

@@ -28,12 +28,13 @@ class ProductionConsumptionLine(models.Model):
         help="Recupere depuis la fiche matiere premiere, modifiable si besoin.",
     )
     opening_stock = fields.Float(
-        string='Stock initial',
-        digits='Product Unit of Measure',
-        required=True,
-        default=0.0,
-        help="Quantite disponible en debut de journee/production.",
-    )
+    string='Stock initial',
+    compute='_compute_opening_stock',
+    digits='Product Unit of Measure',
+    help="Quantité disponible en début de journée/production.",
+)
+    
+
     closing_stock = fields.Float(
         string='Stock final',
         digits='Product Unit of Measure',
@@ -87,3 +88,13 @@ class ProductionConsumptionLine(models.Model):
                 raise ValidationError(
                     "Ce produit est déjà ajouté dans la consommation."
                 )
+    @api.depends('product_id', 'production_id.location_id')
+    def _compute_opening_stock(self):
+        for line in self:
+            if line.product_id and line.production_id.location_id:
+                line.opening_stock = self.env['stock.quant']._get_available_quantity(
+                    product_id=line.product_id,
+                    location_id=line.production_id.location_id,
+                )
+            else:
+                line.opening_stock = 0.1

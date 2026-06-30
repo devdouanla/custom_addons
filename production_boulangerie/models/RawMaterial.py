@@ -31,6 +31,7 @@ class RawMaterial(models.Model):
         default=0.0,
         help="Seuil d'alerte de stock bas.",
     )
+
     stock_actuel = fields.Float(
         string='Stock actuel',
         digits='Product Unit of Measure',

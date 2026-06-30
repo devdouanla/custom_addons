@@ -42,7 +42,7 @@ class Production(models.Model):
 
     state = fields.Selection(
         selection=[
-            ('draft', 'Brouillon'),
+            ('draft', 'Nouveau'),
             ('done', 'Validé'),
             ('cancelled', 'Annulé'),
         ],
