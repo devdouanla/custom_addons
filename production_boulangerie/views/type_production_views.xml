@@ -78,22 +78,6 @@
 
         <!-- ==================== MENUS ==================== -->
 
-        <menuitem
-            id="type_production_menu_root"
-            name="Production"
-            sequence="40"/>
-
-        <menuitem
-            id="type_production_menu_config"
-            name="Configuration"
-            parent="type_production_menu_root"
-            sequence="90"/>
-
-        <menuitem
-            id="type_production_menu_action"
-            name="Types de production"
-            parent="type_production_menu_config"
-            action="type_production_action"
-            sequence="10"/>
+       
 
     </odoo>

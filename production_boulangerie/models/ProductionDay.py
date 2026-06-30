@@ -17,11 +17,15 @@ class ProductionDay(models.Model):
     type_production_id = fields.Many2one(
         comodel_name="type.production",
         string="Type de production",
+            store=True,
+
         required=False,
     )
     type_production_id = fields.Many2one(
         comodel_name="type.production",
         string="Type de production",
+        store=True,
+
         required=False,
     )
     type_production_name = fields.Char(

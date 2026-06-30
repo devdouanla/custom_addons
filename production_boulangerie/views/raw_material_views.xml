@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
 <!--  
          VUE FORMULAIRE : raw.material
@@ -22,6 +23,9 @@
 <field name="purchase_price" string="Prix d achat unitaire"/>
 <field name="stock_minimum" string="Stock minimum"/>
 <field name="stock_actuel" string="Stock actuel"/>
+<field name="is_storable" string="Stock actuel"/>
+<field name="qty_available" string="Quantite"/>
+
 </group>
 </group>
 <group string="Description">
@@ -63,6 +67,5 @@
 <!--  
          MENU
            -->
-<menuitem id="menu_raw_material_root" name="Matieres Premieres" sequence="20"/>
-<menuitem id="menu_raw_material_list" name="Liste des matieres premieres" parent="menu_raw_material_root" action="action_raw_material" sequence="1"/>
+
 </odoo>

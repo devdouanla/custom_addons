@@ -3,17 +3,22 @@
 
     <menuitem
         id="menu_bakery_root"
-        name="Boulangerie"
+        name="Production"
         sequence="50"
     />
-
-    <menuitem
+    <menuitem id="menu_production_day"
+              name="Production Journalière"
+              parent="menu_bakery_root"
+              action="action_production_day"
+              sequence="7"/>
+  <menuitem
         id="menu_bakery_catalogue"
-        name="Catalogue"
+        name="Configuration"
         parent="menu_bakery_root"
         sequence="10"
     />
 
+  
     <menuitem
         id="menu_bakery_products"
         name="Produits"
@@ -21,17 +26,34 @@
         action="action_bakery_products"
         sequence="10"
     />
-
-
-    <menuitem id="menu_production_production"
+ <menuitem
+            id="type_production_menu_action"
+            name="Types de production"
+            parent="menu_bakery_catalogue"
+            action="type_production_action"
+            sequence="70"/>
+<menuitem 
+            id="menu_raw_material_list" 
+            name=" matieres premieres" 
+            parent="menu_bakery_catalogue" 
+            action="action_raw_material" 
+            sequence="60"/>
+  <!-- <menuitem id="menu_production_production"
               name="Productions"
               parent="menu_bakery_catalogue"
               action="action_production_production"
               sequence="6"/>
-    <menuitem id="menu_production_day"
-              name="Journées de Production"
-              parent="menu_bakery_catalogue"
-              action="action_production_day"
-              sequence="7"/>
     
+     <menuitem
+            id="type_production_menu_root"
+            name="Production"
+            sequence="40"/>
+
+        <menuitem
+            id="type_production_menu_config"
+            name="Configuration"
+            parent="type_production_menu_root"
+            sequence="90"/>-->
+
+       
 </odoo>
