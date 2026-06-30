@@ -1,86 +1,132 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- ============================== -->
-    <!-- VUE FORMULAIRE view_product_template_bakery_form -->
-    <!-- ============================== -->
-    <record id="view_production_template_production_form" model="ir.ui.view">
-        <field name="name">production.production.form</field>
-        <field name="model">production.production</field>
-        <field name="arch" type="xml">
-            <form string="Production Boulangerie">
-                <!--<header>
-                                <button name="action_validate" type="object" string="Valider"
-                                        class="oe_highlight" invisible="state != 'draft'"/>
-                                <button name="action_cancel" type="object" string="Annuler"
-                                        invisible="state == 'done'"/>
-                                <button name="action_reset_draft" type="object" string="Remettre en brouillon"
-                                        invisible="state != 'cancelled'"/>
-                                <field name="state" widget="statusbar" statusbar_visible="draft,done"/>
-                            </header>-->
+<record id="view_production_production_form" model="ir.ui.view">
+<field name="name">production.production.form</field>
+<field name="model">production.production</field>
+<field name="arch" type="xml">
+<form string="Bon de Production">
+<header>
+<button name="action_validate" string="Valider" type="object" class="btn-primary" invisible="state != 'draft'" confirm="Confirmer la validation ? Des mouvements de stock seront crees."/>
+<button name="action_cancel" string="Annuler" type="object" invisible="state == 'done'"/>
+<button name="action_reset_draft" string="Remettre en brouillon" type="object" invisible="state != 'cancelled'"/>
+<button name="action_view_stock_moves" string="Mouvements de stock" type="object" class="btn-info" invisible="stock_move_count == 0"/>
+<field name="state" widget="statusbar" statusbar_visible="draft,done,cancelled"/>
+</header>
+<sheet>
+<div class="oe_button_box" name="button_box">
+<button name="action_view_stock_moves" type="object" class="oe_stat_button" icon="fa-exchange" invisible="stock_move_count == 0">
+<field name="stock_move_count" widget="statinfo" string="Mouvements"/>
+</button>
+</div>
+<div class="oe_title">
+<h1>
+<field name="name" readonly="1" placeholder="Reference auto"/>
+</h1>
+</div>
+<field name="currency_id" invisible="1"/>
+<group string="Informations generales">
+<group>
+<field name="production_date" options="{'no_create': True}" readonly="True"/>
+<field name="responsable_id" string="Responsable de production" options="{'no_create': True}" readonly="state != 'draft'"/>
+</group>
+<group>
+<field name="location_id" string="Emplacement de destination" options="{'no_create': True}" readonly="state != 'draft'"/>
 
-                <!-- <sheet> ... partie commentée -->
-                <sheet>
-                <div class="oe_title">
-                    <h1>
-                        <field string="Référence" name="name" readonly="1"/>
-                    </h1>
-                </div>
+</group>
+</group>
+<group string="Indicateurs de rentabilite">
+<group>
+<field name="production_value" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+<field name="consumption_cost" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+</group>
+<group>
+<field name="profit" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+<field name="profit_rate" string="Taux de profit (%)"/>
+</group>
+</group>
+<group string="Indicateurs matières  premières">
+<group>
+<field name="farine_product_id" options="{'no_create': True}" readonly="state != 'draft'"/>
+<field name="unite_mesure_farine_product" string="Unité de mesure" />
+<field name="farine_quantity" readonly="state != 'draft'"/>
+</group>
+<group>
+<field name="production_value_per_bag" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+<field name="profit_per_bag" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+</group>
+</group>
+<notebook>
+<page string="Bordereau de Production" name="page_production">
+<field name="sheet_line_ids" nolabel="1" readonly="state != 'draft'">
+<list editable="bottom" string="Produits finis fabriques">
+<field name="product_id" string="Produit fini" options="{'no_create': True}" domain="[('id', 'not in', parent.used_finished_product_ids)]"/>
+<field name="quantity" string="Quantite produite"/>
+<field name="wholesale_price" string="Prix de gros"/>
+<field name="amount" string="Montant" readonly="1" sum="Total production"/>
+</list>
+</field>
+<group class="oe_subtotal_footer oe_right">
+<field name="production_value" string="TOTAL PRODUCTION" widget="monetary" options="{'currency_field': 'currency_id'}" readonly="1" class="oe_subtotal_footer_separator"/>
+</group>
+</page>
+<page string="Bordereau Matieres Premieres" name="page_consumption">
+<field name="consumption_line_ids" nolabel="1" readonly="state != 'draft'">
+<list editable="bottom" string="Matieres premieres consommees">
+<field name="product_id" string="Matiere premiere" options="{'no_create': True}"  domain="[('id', 'not in', parent.used_raw_material_ids)]"/>
+<field name="opening_stock" string="Stock initial"/>
+<field name="purchase_price" string="Prix achat"/>
+
+<field name="closing_stock" string="Stock final"/>
+<field name="consumption" string="Consommation" readonly="1"/>
+<field name="consumption_cost" string="Cout" readonly="1" sum="Cout total MP"/>
+</list>
+</field>
+<group class="oe_subtotal_footer oe_right">
+<field name="consumption_cost" string="COUT TOTAL MATIERES" widget="monetary" options="{'currency_field': 'currency_id'}" readonly="1" class="oe_subtotal_footer_separator"/>
+</group>
+</page>
+<page string="Notes" name="page_notes">
+<field name="notes" placeholder="Observations..." readonly="state == 'done'"/>
+</page>
+</notebook>
 </sheet>
-                <!-- Le reste de la structure (group, notebook, etc.) est commenté ci-dessous -->
-
-            </form>
-        </field>
-    </record>
-
-    <!-- ============================== -->
-    <!-- VUE LISTE -->
-    <!-- ============================== -->
-    <!-- <record id="view_production_template_production_list" model="ir.ui.view">
-        <field name="name">production.production.list</field>
-        <field name="model">production.production</field>
-        <field name="arch" type="xml">
-            <list string="Productions">
-                <field name="name"/>
-                <field name="production_value"/>
-                <field name="consumption_cost"/>
-                <field name="profit"/>
-                <field name="profit_rate" widget="percentage"/>
-                <field name="state" widget="badge"
-                       decoration-success="state == 'done'"
-                       decoration-danger="state == 'cancelled'"
-                       decoration-info="state == 'draft'"/>
-            </list>
-                    </field>
-    </record>
-    -->
-
-    <!-- ============================== -->
-    <!-- VUE RECHERCHE -->
-    <!-- ============================== -->
-    <!--<record id="view_production_template_production_search" model="ir.ui.view">
-        <field name="name">production.production.search</field>
-        <field name="model">production.production</field>
-        <field name="arch" type="xml">
-            <search string="Rechercher Production">
-                <field name="name"/>
-                <field name="farine_product_id"/>
-                <filter string="Brouillon" name="filter_draft" domain="[('state','=','draft')]"/>
-                <filter string="Validé" name="filter_done" domain="[('state','=','done')]"/>
-                <filter string="Annulé" name="filter_cancelled" domain="[('state','=','cancelled')]"/>
-                <separator/>
-                <filter string="État" name="group_state" context="{'group_by':'state'}"/>
-            </search>
-        </field>
-    </record>-->
-
-    <!-- ============================== -->
-    <!-- ACTION -->
-    <!-- ============================== -->
-    <record id="action_production_production" model="ir.actions.act_window">
-        <field name="name">Productions</field>
-        <field name="res_model">production.production</field>
-        <field name="view_mode">form</field>
-        <!--<field name="search_view_id" ref="view_production_template_production_search"/>-->
-    </record>
-
+<chatter/>
+</form>
+</field>
+</record>
+<record id="view_production_production_list" model="ir.ui.view">
+<field name="name">production.production.list</field>
+<field name="model">production.production</field>
+<field name="arch" type="xml">
+<list string="Productions" decoration-success="state == 'done'" decoration-muted="state == 'cancelled'" decoration-info="state == 'draft'">
+<field name="name" string="Reference"/>
+<field name="production_day_id" string="Jour de production"/>
+<field name="responsable_id" string="Responsable"/>
+<field name="production_value" string="Valeur prod." widget="monetary" options="{'currency_field': 'currency_id'}"/>
+<field name="consumption_cost" string="Cout MP" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+<field name="profit" string="Profit" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+<field name="profit_rate" string="Taux (%)"/>
+<field name="state" widget="badge" decoration-success="state == 'done'" decoration-warning="state == 'draft'" decoration-danger="state == 'cancelled'"/>
+</list>
+</field>
+</record>
+<record id="view_production_production_search" model="ir.ui.view">
+<field name="name">production.production.search</field>
+<field name="model">production.production</field>
+<field name="arch" type="xml">
+<search string="Rechercher une production">
+<field name="name" string="Reference"/>
+<field name="production_day_id" string="Jour"/>
+</search>
+</field>
+</record>
+<record id="action_production_production" model="ir.actions.act_window">
+<field name="name">Productions</field>
+<field name="res_model">production.production</field>
+<field name="view_mode">list,form</field>
+<field name="search_view_id" ref="view_production_production_search"/>
+<field name="help" type="html">
+<p class="o_view_nocontent_smiling_face">Creer votre premiere production</p>
+</field>
+</record>
 </odoo>

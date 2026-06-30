@@ -3,20 +3,15 @@ from odoo.exceptions import ValidationError
 
 
 class BakeryProduct(models.Model):
-    _inherit = 'product.template'
+    _name = 'bakery.product'
+    _inherits= {"product.template": "product_template_id"}
+    _description = 'Produit Boulangerie'
 
+    product_template_id = fields.Many2one('product.template', required=True, ondelete='cascade')
     # ==================================================================
     # Champs personnalisés
     # ==================================================================
-    bakery_product_type = fields.Selection(
-        selection=[
-            ('finished_product', 'Produit fini'),
-            ('raw_material', 'Matière première'),
-        ],
-        string='Type (Boulangerie)',
-        default=False,
-        help="Catégorisation boulangerie : produit fini ou matière première.",
-    )
+    
     type_tarification = fields.Selection(
         [('caisse', 'Produit caisse'),
          ('livraison', 'Produit livraison')],
@@ -24,7 +19,7 @@ class BakeryProduct(models.Model):
         default='caisse'
     )
     list_price = fields.Monetary(
-        
+        string='Prix de Détail',
         help="Prix de vente lorsque le client  souhaite  garder de ristourne.",
     )
     prix_en_gros = fields.Monetary(
@@ -33,8 +28,7 @@ class BakeryProduct(models.Model):
         default=0.0,
         help="Prix de vente lorsque le client ne souhaite pas garder de ristourne.",
     )
-    property_stock_production = fields.Many2one(
-        string='Dépôt de Production')
+
    
     @api.constrains('prix_en_gros', 'list_price')
     def _check_prices(self):

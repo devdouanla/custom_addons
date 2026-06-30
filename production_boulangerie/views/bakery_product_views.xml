@@ -1,77 +1,84 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
-    <!-- ===== HÉRITAGE FORM product.template ===== -->
-    <record id="view_product_template_bakery_form" model="ir.ui.view">
-        <field name="name">product.template.bakery.form</field>
-        <field name="model">product.template</field>
-        <field name="inherit_id" ref="product.product_template_form_view"/>
+    <!-- ================= FORM ================= -->
+    <record id="view_bakery_product_form" model="ir.ui.view">
+        <field name="name">bakery.product.form</field>
+        <field name="model">bakery.product</field>
         <field name="arch" type="xml">
+            <form string="Produit de boulangerie">
 
-            <xpath expr="//notebook" position="inside">
-                <page string="Boulangerie" name="bakery_page">
+                <sheet>
 
-                    <group string="Tarification">
-                        <group>
-                            <field name="list_price" string="Prix de Détail" />
-                            <field name="prix_en_gros" string="Prix de Gros"/>
+                    <group>
+
+                        <group string="Informations générales">
+
+                            <field name="product_template_id" invisible="1"/>
+
+                            <field name="name"/>
+
+                            
+                           
+
                         </group>
 
-                        
+                       
 
-                        <group>
-                            <field name="type_tarification"/>
-                        </group>
                     </group>
 
-                </page>
-            </xpath>
+                    <group string="Tarification">
 
+                        <group>
+
+                            <field name="list_price"/>
+
+                            <field name="prix_en_gros"/>
+
+                        </group>
+
+                        <group>
+
+                            <field name="type_tarification"/>
+
+                        </group>
+
+                    </group>
+
+                </sheet>
+
+            </form>
         </field>
     </record>
 
-    <!-- ===== LIST VIEW ===== -->
-    <record id="view_product_template_bakery_list" model="ir.ui.view">
-        <field name="name">product.template.bakery.list</field>
-        <field name="model">product.template</field>
+    <!-- ================= LIST ================= -->
+
+    <record id="view_bakery_product_tree" model="ir.ui.view">
+        <field name="name">bakery.product.tree</field>
+        <field name="model">bakery.product</field>
         <field name="arch" type="xml">
 
-            <list string="Produits Boulangerie">
-                <field name="property_stock_production" string="Dépôt de Production"/>
-                <field name="name" string="Produit"/>
-                <field name="list_price" string="Prix de Détail"/>
-                <field name="prix_en_gros" string="Prix de Gros"/>
-                <field name="qty_available" string="Qté en Stock"/>
+            <list>
+
+                <field name="name"/>
+
+                <field name="list_price"/>
+
+                <field name="prix_en_gros"/>
+
+                <field name="qty_available"/>
+
             </list>
 
         </field>
     </record>
 
-    <!-- ===== ACTION ===== -->
+    <!-- ================= ACTION ================= -->
+
     <record id="action_bakery_products" model="ir.actions.act_window">
-        <field name="name">Produits Boulangerie</field>
-        <field name="res_model">product.template</field>
+        <field name="name">Produits de boulangerie</field>
+        <field name="res_model">bakery.product</field>
         <field name="view_mode">list,form</field>
-
-        <field name="view_ids" eval="[
-            (5, 0, 0),
-            (0, 0, {
-                'view_mode': 'list',
-                'view_id': ref('view_product_template_bakery_list')
-            }),
-            (0, 0, {
-                'view_mode': 'form',
-                'view_id': ref('view_product_template_bakery_form')
-            })
-        ]"/>
-
-        <field name="context">{'default_type': 'consu'}</field>
-
-        <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">
-                Ajouter un produit boulangerie
-            </p>
-        </field>
     </record>
 
 </odoo>

@@ -1,24 +1,26 @@
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError
+from odoo import models, fields, api
+
+
 class ProductionSheetLine(models.Model):
-    """Ligne d'une fiche de production : un produit fini fabriqué."""
+    """Ligne d'une fiche de production : un produit fini fabrique."""
     _name = 'production.sheet.line'
     _description = 'Ligne de Fiche de Production'
 
-    sheet_id = fields.Many2one(
-        comodel_name='production.sheet',
-        string='Fiche de production',
+    production_id = fields.Many2one(
+        comodel_name='production.production',
+        string='Production',
         required=True,
         ondelete='cascade',
     )
     product_id = fields.Many2one(
-        comodel_name='product.template',
+        comodel_name='bakery.product',
         string='Produit fini',
         required=True,
-        domain=[('bakery_product_type', '=', 'finished_product')],
     )
     quantity = fields.Float(
-        string='Quantité produite',
+        string='Quantite produite',
         required=True,
         default=1.0,
         digits='Product Unit of Measure',
@@ -29,7 +31,7 @@ class ProductionSheetLine(models.Model):
         compute='_compute_wholesale_price',
         store=True,
         readonly=False,
-        help="Récupéré depuis la fiche produit, modifiable si besoin.",
+        help="Recupere depuis la fiche produit (prix_en_gros), modifiable si besoin.",
     )
     amount = fields.Float(
         string='Montant',
@@ -38,11 +40,14 @@ class ProductionSheetLine(models.Model):
         digits='Product Price',
     )
 
+    # ── Compute ──────────────────────────────────────────────────────────
+
     @api.depends('product_id')
     def _compute_wholesale_price(self):
         for line in self:
-            if line.product_id and line.product_id.product_tag_ids:
-                line.wholesale_price = line.product_id.product_tag_ids.wholesale_price
+            # prix_en_gros est le champ direct sur bakery.product
+            if line.product_id:
+                line.wholesale_price = line.product_id.prix_en_gros
             else:
                 line.wholesale_price = 0.0
 
@@ -50,3 +55,16 @@ class ProductionSheetLine(models.Model):
     def _compute_amount(self):
         for line in self:
             line.amount = line.quantity * line.wholesale_price
+    #----verification de ligne----------------------------------------------------
+    @api.constrains('product_id', 'production_id')
+    def _check_duplicate_product(self):
+        for rec in self:
+            duplicates = self.search([
+                ('production_id', '=', rec.production_id.id),
+                ('product_id', '=', rec.product_id.id),
+                ('id', '!=', rec.id),
+            ])
+            if duplicates:
+                raise ValidationError(
+                    "Ce produit est déjà ajouté dans la production."
+                )
