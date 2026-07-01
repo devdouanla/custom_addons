@@ -1,6 +1,7 @@
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError
-
+import logging
+logger = logging.getLogger(__name__)
 class ProductionConsumptionLine(models.Model):
     """Ligne de consommation : une matiere premiere consommee."""
     _name = 'production.consumption.line'
@@ -88,13 +89,24 @@ class ProductionConsumptionLine(models.Model):
                 raise ValidationError(
                     "Ce produit est déjà ajouté dans la consommation."
                 )
-    @api.depends('product_id', 'production_id.location_id')
+
+
+    @api.depends('product_id', 'production_id.location_id.stock_location_id')
     def _compute_opening_stock(self):
         for line in self:
-            if line.product_id and line.production_id.location_id:
+            if line.product_id and line.production_id.location_id.stock_location_id:
+                variant = line.product_id.product_variant_id
                 line.opening_stock = self.env['stock.quant']._get_available_quantity(
-                    product_id=line.product_id,
-                    location_id=line.production_id.location_id,
+                product_id=variant,
+                    location_id=line.production_id.location_id.stock_location_id,
                 )
             else:
-                line.opening_stock = 0.1
+                line.opening_stock = 0.0
+    @api.constrains('product_id', 'production_id')
+    def _check_location(self):
+        for line in self:
+            if line.product_id and not line.production_id.location_id.stock_location_id:
+                raise ValidationError(
+                "Aucun emplacement de stock trouvé pour la production %s." % line.production_id.name
+                )
+                

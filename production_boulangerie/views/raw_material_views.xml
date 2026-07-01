@@ -22,8 +22,7 @@
 <group>
 <field name="purchase_price" string="Prix d achat unitaire"/>
 <field name="stock_minimum" string="Stock minimum"/>
-<field name="stock_actuel" string="Stock actuel"/>
-<field name="is_storable" string="Stock actuel"/>
+<field name="is_storable" string="Stockable"/>
 <field name="qty_available" string="Quantite"/>
 
 </group>

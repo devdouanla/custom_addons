@@ -30,7 +30,6 @@
 <field name="responsable_id" string="Responsable de production" options="{'no_create': True}" readonly="state != 'draft'"/>
 </group>
 <group>
-<field name="location_id" string="Emplacement de destination" options="{'no_create': True}" readonly="state != 'draft'"/>
 
 </group>
 </group>

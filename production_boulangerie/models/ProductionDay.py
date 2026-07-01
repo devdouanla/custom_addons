@@ -21,13 +21,7 @@ class ProductionDay(models.Model):
 
         required=False,
     )
-    type_production_id = fields.Many2one(
-        comodel_name="type.production",
-        string="Type de production",
-        store=True,
-
-        required=False,
-    )
+    
     type_production_name = fields.Char(
     compute="_compute_type_name",
     store=True,
@@ -66,9 +60,7 @@ class ProductionDay(models.Model):
             if not vals.get('type_production_id'):
                 vals['reference'] = False
             continue
-
         type_production = self.env['type.production'].browse(vals['type_production_id'])
-
         if vals.get('date'):
             date = fields.Date.to_date(vals['date'])
             reference = f"{type_production.code}/{date.strftime('%d/%m/%Y')}"

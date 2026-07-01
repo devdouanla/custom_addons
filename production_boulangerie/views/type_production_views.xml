@@ -8,7 +8,7 @@
             <field name="arch" type="xml">
                 <list string="Types de production">
                     <field name="code"/>
-                    <field name="name"/>
+                    <field name="name" string="Désignation" />
                 </list>
             </field>
         </record>
@@ -23,7 +23,7 @@
 
                         <div class="oe_title">
                             <h1>
-                                <field name="name"
+                                <field name="name"  string="Désignation"
                                     placeholder="Ex : Boulangerie, Pâtisserie..."/>
                             </h1>
                         </div>
@@ -32,7 +32,6 @@
                             <field name="code"
                                 placeholder="Code généré automatiquement"/>
                         </group>
-
                         <div class="oe_button_box" name="button_box">
                             <button
                                 name="action_generate_code"
@@ -57,6 +56,7 @@
             <search>
                 <field name="name"/>
                 <field name="code"/>
+                
             </search>
         </field>
     </record>

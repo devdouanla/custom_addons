@@ -22,15 +22,12 @@ class Production(models.Model):
     readonly=True,
 )
     name = fields.Char(
-        string='Référence',
-        required=True,
-        copy=False,
-        index=True,
-        readonly=True,
-         store=True,
-        default=lambda self: self.env['ir.sequence'].next_by_code('production.production') or _('Nouveau')
-        
-    )
+    string="Référence",
+    compute='_compute_reference',
+    store=True,
+    readonly=True,
+    copy=False,
+)
     responsable_id = fields.Many2one(
     comodel_name='res.partner',
     string='Responsable de production',
@@ -140,9 +137,9 @@ class Production(models.Model):
     readonly=True,
 )
     location_id = fields.Many2one(
-    comodel_name='stock.location',
+    comodel_name='type.production',
+    related='production_day_id.type_production_id',
     string='Emplacement de destination',
-    domain=[('usage', 'in', ['internal', 'transit'])],
     required=False,
     readonly=False,
     store=True,
@@ -204,15 +201,27 @@ class Production(models.Model):
                 
             else:
                 rec.farine_quantity = 0.0
-    @api.model
-    def create(self, vals_list):
-        for vals in vals_list:
-            if not vals.get('name') or vals.get('name') == _('Nouveau'):
-                vals['name'] = self.env['ir.sequence'].next_by_code('production.production')
-            
-            # Vous pouvez ajouter d'autres initialisations ici (date, etc.)
-        
-        return super().create(vals_list)
+
+    @api.depends('location_id', 'production_date')
+    def _compute_reference(self):
+        for rec in self:
+        # Garde-fou : ne recalcule que si le nom n'existe pas encore
+            if rec.name:
+                continue
+
+            if rec.location_id and rec.production_date:
+                date_value = rec.production_date
+                if isinstance(date_value, str):
+                    date_value = fields.Date.from_string(date_value)
+                date_str = date_value.strftime('%d/%m/%Y')
+
+                location_code = rec.location_id.code or "UNK"
+                sequence_number = self.env['ir.sequence'].next_by_code('production.production') or '000'
+
+                rec.name = "%s/PROD/%s%s" % (location_code,date_str,sequence_number)
+            else:
+                rec.name = False                       
+    
     # ── Actions ──────────────────────────────────────────────────────────────────
 
     def action_validate(self):
@@ -359,6 +368,7 @@ class Production(models.Model):
         for prod in self:
             prod.used_finished_product_ids = prod.sheet_line_ids.mapped('product_id')
             prod.used_raw_material_ids = prod.consumption_line_ids.mapped('product_id')
+    
 class StockMove(models.Model):
     """Extension de stock.move pour lier aux productions boulangerie."""
     _inherit = 'stock.move'
