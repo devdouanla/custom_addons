@@ -41,7 +41,7 @@ class RawMaterial(models.Model):
  
     unite_mesure = fields.Many2one(
     'uom.uom',
-    string="Unité de mesure"
+    string="Unité de base"
 )
        
     # ── Constraintes ─────────────────────────────────────────────────────

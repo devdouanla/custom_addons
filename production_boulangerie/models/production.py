@@ -11,9 +11,10 @@ class Production(models.Model):
     production_day_id=fields.Many2one(
         comodel_name='production.day',
         string='le jour  de production',
-        required=True,
+        required=True,      # ← ajoute ceci
         store=True,
         ondelete='cascade',
+        default=lambda self: self._default_production_day_id(),
     )
     production_date = fields.Date(
     string="Date de production",
@@ -105,7 +106,7 @@ class Production(models.Model):
     )
     unite_mesure_farine_product = fields.Many2one(
     'uom.uom',
-    string="unité de mesure",
+    string="unité de base",
     related='farine_product_id.unite_mesure',
     store=True,
     readonly=True,
@@ -119,13 +120,13 @@ class Production(models.Model):
     default=0.0,
     )
     profit_per_bag = fields.Float(
-        string='Profit par unite',
+        string='Profit par unite de mesure',
         compute='_compute_flour_kpis',
         store=True,
         digits='Product Price',
     )
     production_value_per_bag = fields.Float(
-        string='Valeur production par unite',
+        string='Valeur production par unite de mesure',
         compute='_compute_flour_kpis',
         store=True,
         digits='Product Price',
@@ -135,6 +136,10 @@ class Production(models.Model):
     string='Devise',
     default=lambda self: self.env.company.currency_id,
     readonly=True,
+)
+    display_uom_id = fields.Many2one(
+    'uom.uom',
+    string="Unité d'affichage",
 )
     location_id = fields.Many2one(
     comodel_name='type.production',
@@ -174,16 +179,41 @@ class Production(models.Model):
             else:
                 prod.profit_rate = 0.0
 
-    @api.depends('profit', 'production_value', 'farine_quantity')
+    
+    @api.depends(
+    'profit',
+    'production_value',
+    'farine_quantity',
+    'unite_mesure_farine_product',
+    'display_uom_id'
+)
     def _compute_flour_kpis(self):
         for prod in self:
-            if prod.farine_quantity:
-                prod.profit_per_bag = prod.profit / prod.farine_quantity
-                prod.production_value_per_bag = prod.production_value / prod.farine_quantity
-            else:
-                prod.profit_per_bag = 0.0
-                prod.production_value_per_bag = 0.0
+        # Valeurs par défaut
+            prod.profit_per_bag = 0.0
+            prod.production_value_per_bag = 0.0
 
+        # Aucune quantité de farine
+            if not prod.farine_quantity:
+                continue
+
+            qty = prod.farine_quantity
+
+        # Conversion vers l'unité d'affichage si nécessaire
+            if (
+            prod.unite_mesure_farine_product
+            and prod.display_uom_id
+            and prod.unite_mesure_farine_product != prod.display_uom_id
+            ):
+                qty = prod.unite_mesure_farine_product._compute_quantity(
+                prod.farine_quantity,
+                prod.display_uom_id
+                )
+
+        # Évite une division par zéro
+            if qty > 0:
+                prod.profit_per_bag = prod.profit / qty
+                prod.production_value_per_bag = prod.production_value / qty
     @api.depends('stock_move_ids')
     def _compute_stock_move_count(self):
         for prod in self:
@@ -201,7 +231,10 @@ class Production(models.Model):
                 
             else:
                 rec.farine_quantity = 0.0
-
+    @api.onchange('farine_product_id')
+    def _onchange_farine_product_id(self):
+        if self.farine_product_id:
+            self.display_uom_id = self.farine_product_id.unite_mesure
     @api.depends('location_id', 'production_date')
     def _compute_reference(self):
         for rec in self:
@@ -329,7 +362,7 @@ class Production(models.Model):
     def _create_finished_product_move(self, line, src_location, dest_location):
         """Crée un stock.move pour un produit fini fabriqué."""
         return self.env['stock.move'].create({
-            'name': _('Production: %s', line.product_id.display_name),
+           
             'product_id': line.product_id.id,
             'product_uom_qty': line.quantity,
             'product_uom': line.product_id.uom_id.id,
@@ -342,7 +375,7 @@ class Production(models.Model):
     def _create_raw_material_move(self, line, src_location, dest_location):
         """Crée un stock.move pour une matière première consommée."""
         return self.env['stock.move'].create({
-            'name': _('Consommation: %s', line.product_id.display_name),
+            
             'product_id': line.product_id.id,
             'product_uom_qty': line.consumption,
             'product_uom': line.product_id.uom_id.id,
@@ -368,7 +401,20 @@ class Production(models.Model):
         for prod in self:
             prod.used_finished_product_ids = prod.sheet_line_ids.mapped('product_id')
             prod.used_raw_material_ids = prod.consumption_line_ids.mapped('product_id')
-    
+    def _default_production_day_id(self):
+        """Récupère le production.day du jour, le crée automatiquement s'il n'existe pas."""
+        today = fields.Date.context_today(self)
+        ProductionDay = self.env['production.day']
+        day = ProductionDay.search([('date', '=', today)], limit=1)
+        if not day:
+            default_type_id = self.env['production.day']._default_type_production_id()
+            if not default_type_id:
+                return False  # aucun type.production en base, impossible de créer
+            day = ProductionDay.create({
+            'date': today,
+            'type_production_id': default_type_id,
+            })
+        return day.id
 class StockMove(models.Model):
     """Extension de stock.move pour lier aux productions boulangerie."""
     _inherit = 'stock.move'

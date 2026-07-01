@@ -1,6 +1,5 @@
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError
-from odoo.orm import decorators as api
 class ProductionDay(models.Model):
     _name = 'production.day'
     _description = 'Production Day'
@@ -17,9 +16,9 @@ class ProductionDay(models.Model):
     type_production_id = fields.Many2one(
         comodel_name="type.production",
         string="Type de production",
-            store=True,
-
-        required=False,
+        store=True,
+        required=True,
+        default=lambda self: self._default_type_production_id(),
     )
     
     type_production_name = fields.Char(
@@ -67,3 +66,7 @@ class ProductionDay(models.Model):
             vals['reference'] = reference
 
         return super().create(vals_list)
+    def _default_type_production_id(self):
+        """Reprend le type de production du dernier production.day créé."""
+        last_day = self.search([('type_production_id', '!=', False)], order='date desc, id desc', limit=1)
+        return last_day.type_production_id.id if last_day else False

@@ -41,9 +41,13 @@ class TypeProduction(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
-            vals['usage'] = 'internal'
-            vals['complete_name']=self.name
-            if vals.get('name') and not vals.get('code'):
-                vals['code'] = self._generate_code_from_name(vals['name'])
+            type_production_id = vals.get('type_production_id')
+            if not type_production_id:
+                vals['reference'] = False
+                continue
+            type_production = self.env['type.production'].browse(type_production_id)
+            if vals.get('date'):
+                date = fields.Date.to_date(vals['date'])
+                vals['reference'] = f"{type_production.code}/{date.strftime('%d/%m/%Y')}"
         return super().create(vals_list)
      

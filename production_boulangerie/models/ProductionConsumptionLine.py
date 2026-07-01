@@ -107,6 +107,6 @@ class ProductionConsumptionLine(models.Model):
         for line in self:
             if line.product_id and not line.production_id.location_id.stock_location_id:
                 raise ValidationError(
-                "Aucun emplacement de stock trouvé pour la production %s." % line.production_id.name
+                "Aucun1 emplacement de stock trouvé pour la production %s." % line.production_id.name
                 )
                 
