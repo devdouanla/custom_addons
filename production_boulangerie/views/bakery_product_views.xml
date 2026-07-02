@@ -15,9 +15,11 @@
                         <group string="Informations générales">
 
                             <field name="product_template_id" invisible="1"/>
-
                             <field name="name"/>
+                            <field name="qty_available" string="Quantite en Stock"/>
 
+ 
+                              
                             
                            
 
@@ -31,7 +33,7 @@
 
                         <group>
 
-                            <field name="list_price"/>
+                            <field name="list_price"  string='Prix de Détail'/>
 
                             <field name="prix_en_gros"/>
 

@@ -16,14 +16,12 @@
 </div>
 <group string="Identification">
 <group>
-<field name="default_code" string="Reference interne"/>
 <field name="unite_mesure" string="Unite de mesure"/>
 </group>
 <group>
-<field name="purchase_price" string="Prix d achat unitaire"/>
+<field name="standard_price" string="Prix d achat unitaire"/>
 <field name="stock_minimum" string="Stock minimum"/>
-<field name="is_storable" string="Stockable"/>
-<field name="qty_available" string="Quantite"/>
+<field name="qty_available" string="Quantite en Stock"/>
 
 </group>
 </group>
@@ -42,10 +40,9 @@
 <field name="model">raw.material</field>
 <field name="arch" type="xml">
 <list string="Matieres Premieres" >
-<field name="default_code" string="Reference"/>
 <field name="name" string="Designation"/>
 <field name="unite_mesure" string="Unite"/>
-<field name="purchase_price" string="Prix achat"/>
+<field name="standard_price" string="Prix achat"/>
 <field name="stock_minimum" string="Stock min."/>
 <field name="stock_actuel" string="Stock actuel"/>
 </list>

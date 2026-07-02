@@ -15,15 +15,9 @@ class RawMaterial(models.Model):
         ondelete='cascade',
         
     )
-
+  
     # ── Champs specifiques matieres premieres ────────────────────────────
 
-    purchase_price = fields.Float(
-        string="Prix d'achat unitaire",
-        digits='Product Price',
-        default=0.0,
-        help="Prix d'achat par unite de mesure.",
-    )
   
     stock_minimum = fields.Float(
         string='Stock minimum',
@@ -46,10 +40,10 @@ class RawMaterial(models.Model):
        
     # ── Constraintes ─────────────────────────────────────────────────────
 
-    @api.constrains('purchase_price')
-    def _check_purchase_price(self):
+    @api.constrains('standard_price')
+    def _check_standard_price(self):
         for rec in self:
-            if rec.purchase_price < 0:
+            if rec.standard_price < 0:
                 raise ValidationError(
                     "Le prix d'achat ne peut pas etre negatif."
                 )
@@ -61,3 +55,8 @@ class RawMaterial(models.Model):
                 raise ValidationError(
                     "Le stock minimum ne peut pas etre negatif."
                 )
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            vals['is_storable'] = True
+        return super().create(vals_list)

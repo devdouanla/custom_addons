@@ -18,17 +18,18 @@ class BakeryProduct(models.Model):
         string="Type de produit",
         default='caisse'
     )
-    list_price = fields.Monetary(
-        string='Prix de Détail',
-        help="Prix de vente lorsque le client  souhaite  garder de ristourne.",
-    )
+  
     prix_en_gros = fields.Monetary(
         string='Prix de Gros',
         currency_field='currency_id',
         default=0.0,
         help="Prix de vente lorsque le client ne souhaite pas garder de ristourne.",
     )
-
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            vals['is_storable'] = True
+        return super().create(vals_list)
    
     @api.constrains('prix_en_gros', 'list_price')
     def _check_prices(self):

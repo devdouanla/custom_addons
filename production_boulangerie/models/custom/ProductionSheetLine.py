@@ -1,6 +1,5 @@
 from odoo import models, fields, api
-from odoo.exceptions import ValidationError
-from odoo import models, fields, api
+from odoo.exceptions import ValidationError, UserError
 
 
 class ProductionSheetLine(models.Model):
@@ -13,24 +12,27 @@ class ProductionSheetLine(models.Model):
         string='Production',
         required=True,
         ondelete='cascade',
+         store=True
     )
     product_id = fields.Many2one(
         comodel_name='bakery.product',
         string='Produit fini',
         required=True,
+         store=True
     )
     quantity = fields.Float(
         string='Quantite produite',
         required=True,
         default=1.0,
         digits='Product Unit of Measure',
+         store=True
     )
     wholesale_price = fields.Float(
         string='Prix de gros',
         digits='Product Price',
         compute='_compute_wholesale_price',
         store=True,
-        readonly=False,
+        readonly=True,
         help="Recupere depuis la fiche produit (prix_en_gros), modifiable si besoin.",
     )
     amount = fields.Float(
@@ -68,3 +70,30 @@ class ProductionSheetLine(models.Model):
                 raise ValidationError(
                     "Ce produit est déjà ajouté dans la production."
                 )
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            production_id = vals.get('production_id')
+            if production_id:
+                production = self.env['production.production'].browse(production_id)
+                if production.state == 'done':
+                    raise UserError((
+                        "Impossible d'ajouter une ligne à une production déjà validée."
+                    ))
+        return super().create(vals_list)
+
+    def write(self, vals):
+        for line in self:
+            if line.production_id.state == 'done':
+                raise UserError(_(
+                    "Impossible de modifier une ligne d'une production déjà validée."
+                ))
+        return super().write(vals)
+
+    def unlink(self):
+        for line in self:
+            if line.production_id.state == 'done':
+                raise UserError(_(
+                    "Impossible de supprimer une ligne d'une production déjà validée."
+                ))
+        return super().unlink()

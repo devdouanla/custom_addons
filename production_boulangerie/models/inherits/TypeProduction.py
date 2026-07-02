@@ -43,11 +43,11 @@ class TypeProduction(models.Model):
         for vals in vals_list:
             type_production_id = vals.get('type_production_id')
             if not type_production_id:
-                vals['reference'] = False
+                vals['complete_name'] = False
                 continue
             type_production = self.env['type.production'].browse(type_production_id)
             if vals.get('date'):
                 date = fields.Date.to_date(vals['date'])
-                vals['reference'] = f"{type_production.code}/{date.strftime('%d/%m/%Y')}"
+                vals['complete_name'] = f"{type_production.code}/{date.strftime('%d/%m/%Y')}"
         return super().create(vals_list)
      

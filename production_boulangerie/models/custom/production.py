@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
+from docutils.nodes import line
+
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError, ValidationError
-
+import logging
+_logger = logging.getLogger(__name__)
 
 class Production(models.Model):
     """Production principale : regroupe fiche de production et fiche de consommation."""
@@ -257,67 +260,82 @@ class Production(models.Model):
     
     # ── Actions ──────────────────────────────────────────────────────────────────
 
+
+
+
     def action_validate(self):
-     """Valide la production : crée les mouvements de stock et passe en 'done'."""
-     self.ensure_one()
+        """Valide la production : crée les mouvements de stock et passe en 'done'."""
+        self.ensure_one()
 
-     if self.state != 'draft':
-         raise UserError(_("Seules les productions en brouillon peuvent être validées."))
+        if self.state != 'draft':
+            raise UserError(_("Seules les productions en brouillon peuvent être validées."))
 
-     if not self.sheet_line_ids:
-         raise UserError(_("Veuillez ajouter au moins un produit fini dans le bordereau de production."))
-     if not self.consumption_line_ids:
-         raise UserError(_("Veuillez ajouter au moins une matière première dans le bordereau matières premières."))
+        if not self.sheet_line_ids:
+            raise UserError(_("Veuillez ajouter au moins un produit fini dans le bordereau de production."))
+        if not self.consumption_line_ids:
+            raise UserError(_("Veuillez ajouter au moins une matière première dans le bordereau matières premières."))
 
-    # Emplacement de destination : récupéré depuis le premier champ location_id
-    # si vous avez conservé un location_id sur production.production, sinon adaptez
-     location_id = self.location_id
-     if not location_id:
-        raise UserError(_("L'emplacement de destination est requis."))
+        location_id = self.location_id
+        if not location_id:
+            raise UserError(_("L'emplacement de destination est requis."))
 
-     production_location = self._get_production_location()
+        production_location = self._get_production_location()
 
-    # Valider les consommations
-     for line in self.consumption_line_ids:
-         if line.consumption <= 0:
-             raise ValidationError(_(
+        for line in self.consumption_line_ids:
+            if line.consumption <= 0:
+                raise ValidationError(_(
                 "La consommation de '%s' est nulle ou négative. "
                 "Vérifiez les stocks initial et final.",
                 line.product_id.display_name,
-             ))
+                ))
 
-     moves_to_confirm = self.env['stock.move']
+        moves_to_confirm = self.env['stock.move']
 
-    # A. Produits fabriqués
-     for line in self.sheet_line_ids:
-         if line.quantity <= 0:
-             continue
-         moves_to_confirm |= self._create_finished_product_move(
+        for line in self.sheet_line_ids:
+            if line.quantity <= 0:
+                continue
+            moves_to_confirm |= self._create_finished_product_move(
             line=line,
             src_location=production_location,
-            dest_location=location_id,
-        )
+            dest_location=location_id.stock_location_id,
+            )
 
-    # B. Matières premières consommées
-     for line in self.consumption_line_ids:
-         if line.consumption <= 0:
-             continue
-         moves_to_confirm |= self._create_raw_material_move(
-            line=line,
-            src_location=location_id,
+        for lineConsumpton in self.consumption_line_ids:
+            if lineConsumpton.consumption <= 0:
+                continue
+            moves_to_confirm |= self._create_raw_material_move(
+            line=lineConsumpton,
+            src_location=location_id.stock_location_id,
             dest_location=production_location,
-        )
+            )
 
-     if moves_to_confirm:
-         moves_to_confirm._action_confirm()
-         moves_to_confirm._action_assign()
-         for move in moves_to_confirm:
-             for move_line in move.move_line_ids:
-                 move_line.quantity = move.product_uom_qty
-         moves_to_confirm._action_done()
+        if moves_to_confirm:
+            try:
+                moves_to_confirm._action_confirm()
+                moves_to_confirm._action_assign()
 
-     self.write({'state': 'done'})
-     return True
+                for move in moves_to_confirm:
+                    if not move.move_line_ids:
+                        _logger.warning(
+                        "Aucune move_line créée pour le move %s (produit %s, qty %s) "
+                        "- stock probablement insuffisant à la source %s",
+                        move.id, move.product_id.display_name,
+                        move.product_uom_qty, move.location_id.display_name,
+                        )
+                    for move_line in move.move_line_ids:
+                        move_line.quantity = move.product_uom_qty
+                        move_line.picked = True   # <-- INDISPENSABLE en Odoo 17+/19
+
+                moves_to_confirm._action_done()
+
+            except (UserError, ValidationError) as e:
+                _logger.exception("Échec de la validation des mouvements de stock")
+                raise UserError(_(
+                "Erreur lors de la validation des mouvements de stock : %s"
+                ) % str(e))
+
+        self.write({'state': 'done'})
+        return True
 
     def action_cancel(self):
         """Annule la production (uniquement en brouillon)."""
@@ -361,28 +379,49 @@ class Production(models.Model):
 
     def _create_finished_product_move(self, line, src_location, dest_location):
         """Crée un stock.move pour un produit fini fabriqué."""
+        finished_product = line.product_id          # bakery.product
+        variant = finished_product.product_variant_id  # product.product réel
+
+        if not variant:
+            raise UserError(_(
+            "Impossible de trouver la variante produit pour '%s'.",
+            finished_product.display_name,
+            ))
+
         return self.env['stock.move'].create({
-           
-            'product_id': line.product_id.id,
-            'product_uom_qty': line.quantity,
-            'product_uom': line.product_id.uom_id.id,
-            'location_id': src_location.id,
-            'location_dest_id': dest_location.id,
-            'bakery_production_id': self.id,
-            'origin': self.name,
+        'reference':self.name,
+        'product_id': variant.id,
+        'product_uom_qty': line.quantity,
+        'product_uom': variant.uom_id.id,
+        'location_id': src_location.id,
+        'location_dest_id': dest_location.id,
+        'company_id': self.env.company.id,
+        'bakery_production_id': self.id,
+        'origin': self.name,
+
         })
 
     def _create_raw_material_move(self, line, src_location, dest_location):
         """Crée un stock.move pour une matière première consommée."""
+        raw_material = line.product_id               # raw.material
+        variant = raw_material.product_variant_id     # product.product réel
+
+        if not variant:
+            raise UserError(_(
+            "Impossible de trouver la variante produit pour '%s'.",
+            raw_material.display_name,
+            ))
+
         return self.env['stock.move'].create({
-            
-            'product_id': line.product_id.id,
-            'product_uom_qty': line.consumption,
-            'product_uom': line.product_id.uom_id.id,
-            'location_id': src_location.id,
-            'location_dest_id': dest_location.id,
-            'bakery_production_id': self.id,
-            'origin': self.name,
+        'reference':self.name,
+        'product_id': variant.id,
+        'product_uom_qty': line.consumption,
+        'product_uom': variant.uom_id.id,
+        'location_id': src_location.id,
+        'location_dest_id': dest_location.id,
+        'company_id': self.env.company.id,
+        'bakery_production_id': self.id,
+        'origin': self.name,
         })
 
     used_finished_product_ids = fields.Many2many(
@@ -415,13 +454,4 @@ class Production(models.Model):
             'type_production_id': default_type_id,
             })
         return day.id
-class StockMove(models.Model):
-    """Extension de stock.move pour lier aux productions boulangerie."""
-    _inherit = 'stock.move'
-
-    bakery_production_id = fields.Many2one(
-        comodel_name='production.production',
-        string='Production boulangerie',
-        ondelete='set null',
-        index=True,
-    )
+    
