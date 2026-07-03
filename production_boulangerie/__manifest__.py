@@ -29,6 +29,7 @@ Long description of module's purpose
     'views/production_day_views.xml',
     'views/type_production_views.xml',
     'views/raw_material_views.xml',
+    'views/production_dashboard_views.xml',
     'views/menu.xml',
 
     #'views/menu_views.xml',

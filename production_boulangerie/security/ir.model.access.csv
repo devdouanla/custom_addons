@@ -21,3 +21,6 @@ access_bakery_product_user,bakery.product user,production_boulangerie.model_bake
 access_bakery_product_manager,bakery.product manager,production_boulangerie.model_bakery_product,base.group_system,1,1,1,1
 access_raw_material_user,raw.material user,production_boulangerie.model_raw_material,base.group_user,1,1,1,0
 access_raw_material_manager,raw.material manager,production_boulangerie.model_raw_material,base.group_system,1,1,1,1
+access_production_dashboard_user,production.dashboard user,production_boulangerie.model_production_dashboard,base.group_user,1,0,0,0
+access_production_dashboard_manager,production.dashboard manager,production_boulangerie.model_production_dashboard,base.group_system,1,1,1,1
+
