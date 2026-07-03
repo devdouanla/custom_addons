@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!--
+        Création d'une catégorie de sécurité.
+        Cette catégorie sera affichée dans
+        Paramètres > Utilisateurs & Sociétés > Groupes.
+
+        Elle permet de regrouper les différents groupes
+        de droits de votre module.
+    -->
+    <record id="module_category_administratif" model="ir.module.category">
+
+        <!-- Nom de la catégorie -->
+        <field name="name">Gestion Administratif</field>
+
+        <!--
+            Ordre d'affichage de la catégorie.
+            Plus la valeur est petite, plus elle apparaît en haut.
+        -->
+        <field name="sequence">32</field>
+
+    </record>
+
+
+    <!--
+        Création du groupe "Gestionnaire".
+        Les utilisateurs appartenant à ce groupe auront
+        les permissions définies dans les fichiers security
+        (ir.model.access.csv, record rules, etc.).
+    -->
+    <record id="group_administratif_gestionnaire" model="res.groups">
+
+        <!-- Nom affiché dans Odoo -->
+        <field name="name">GESTIONNAIRE H</field>
+
+        <!--
+            Association du groupe à la catégorie créée ci-dessus.
+        -->
+        <field name="category_id" ref="module_category_administratif"/>
+
+        <!--
+            Ajout automatique des utilisateurs :
+
+            (4, id) = ajoute un enregistrement Many2many
+            sans supprimer les autres.
+
+            base.user_root  = super utilisateur interne
+            base.user_admin = administrateur principal
+        -->
+        <field name="users"
+               eval="[(4,ref('base.user_root')),
+                      (4,ref('base.user_admin'))]" />
+
+    </record>
+
+
+    <!--
+        Création d'un groupe utilisateur standard.
+        Généralement destiné aux utilisateurs normaux
+        ayant moins de privilèges que le gestionnaire.
+    -->
+    <record id="group_administratif_user" model="res.groups">
+
+        <!-- Nom du groupe -->
+        <field name="name">Utilisateur U</field>
+
+        <!-- Catégorie dans laquelle apparaît le groupe -->
+        <field name="category_id"
+               ref="module_category_administratif"/>
+
+    </record>
+
+</odoo>

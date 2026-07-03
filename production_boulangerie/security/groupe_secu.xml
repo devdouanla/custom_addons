@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!--  Catégorie du module  -->
+        <record id="module_category_gestion_production" model="ir.module.category">
+                <field name="name">Gestion Production</field>
+                <field name="sequence">31</field>
+        </record>
+        <!--  Privilège lié à la catégorie (obligatoire depuis Odoo 19)  -->
+        <record id="privilege_gestion_production" model="res.groups.privilege">
+                <field name="name">Gestion Production</field>
+                <field name="sequence">10</field>
+                <field name="category_id" ref="module_category_gestion_production"/>
+        </record>
+        <!--  Utilisateur  -->
+        <record id="group_boulangerie_user" model="res.groups">
+                <field name="name">Utilisateur</field>
+                <field name="privilege_id" ref="privilege_gestion_production"/>
+        </record>
+        <!--  Chef d'équipe  -->
+        <record id="group_boulangerie_chef_equipe" model="res.groups">
+                <field name="name">Chef d'équipe</field>
+                <field name="privilege_id" ref="privilege_gestion_production"/>
+                <field name="implied_ids" eval="[(4, ref('group_boulangerie_user'))]"/>
+        </record>
+        <!--  Responsable Production  -->
+                <record id="group_boulangerie_responsable_production" model="res.groups">
+                <field name="name">Responsable Production</field>
+                <field name="privilege_id" ref="privilege_gestion_production"/>
+                <field name="implied_ids" eval="[(4, ref('group_boulangerie_chef_equipe'))]"/>
+        </record>
+        <!--  Responsable Stocks  -->
+        <record id="group_boulangerie_responsable_stock" model="res.groups">
+                <field name="name">Responsable Stocks</field>
+                <field name="privilege_id" ref="privilege_gestion_production"/>
+                <field name="implied_ids" eval="[(4, ref('group_boulangerie_chef_equipe'))]"/>
+        </record>
+        <!--  Gestionnaire  -->
+        <record id="group_boulangerie_gestionnaire" model="res.groups">
+                <field name="name">Gestionnaire</field>
+                <field name="privilege_id" ref="privilege_gestion_production"/>
+                <field name="implied_ids" eval="[(4, ref('group_boulangerie_responsable_production')), (4, ref('group_boulangerie_responsable_stock'))]"/>
+        </record>
+        <!--  Directeur  -->
+        <record id="group_boulangerie_directeur" model="res.groups">
+                <field name="name">Directeur</field>
+                <field name="privilege_id" ref="privilege_gestion_production"/>
+                <field name="implied_ids" eval="[(4, ref('group_boulangerie_gestionnaire'))]"/>
+        </record>
+        <!--  Affectation des utilisateurs admin au groupe Directeur  -->
+        <!--  (le champ 'users' n'existe plus sur res.groups en Odoo 19 :
+             on passe donc par res.users.groups_id)  -->
+        <record id="base.user_root" model="res.users">
+                <field name="groups_id" eval="[(4, ref('group_boulangerie_directeur'))]"/>
+        </record>
+        <record id="base.user_admin" model="res.users">
+                <field name="groups_id" eval="[(4, ref('group_boulangerie_directeur'))]"/>
+        </record>  
+     </data>
+</odoo>
+ 
+
+
+<!--
+Utilisateur : droits de base.
+Chef d'équipe : hérite des droits d'Utilisateur.
+Responsable Production : hérite de Chef d'équipe.
+Responsable Stocks : hérite de Chef d'équipe.
+Gestionnaire : hérite des droits des deux responsables.
+Directeur : hérite de tous les droits du Gestionnaire, donc possède l'ensemble des permissions de l'application. 
+Cette organisation est la plus couramment utilisée dans les modules Odoo.
+-->

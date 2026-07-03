@@ -22,6 +22,7 @@ Long description of module's purpose
 
     # always loaded
     'data': [
+    'security/groupe_secu.xml',
     'security/ir.model.access.csv',
     'views/utils/sequence_views.xml',
     'views/bakery_product_views.xml',
