@@ -7,7 +7,7 @@
 Long description of module's purpose
     """,
 
-    'author': "My Company",
+    'author': "Djouda douanla",
     'website': "https://www.yourcompany.com",
     'application':True,
     'license': 'LGPL-3',
@@ -24,6 +24,7 @@ Long description of module's purpose
     'data': [
     'security/groupe_secu.xml',
     'security/ir.model.access.csv',
+    'views/custom_login/login_templates.xml',
     'views/utils/sequence_views.xml',
     'views/bakery_product_views.xml',
     'views/production_views.xml',
@@ -39,5 +40,11 @@ Long description of module's purpose
     'demo': [
         'demo/demo.xml',
     ],
+    #  assets 
+    'assets': {
+        'web.assets_frontend': [
+            'production_boulangerie/static/src/scss/login.scss',
+        ],
+    },
 }
 

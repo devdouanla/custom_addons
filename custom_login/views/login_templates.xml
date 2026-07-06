@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Template autonome : ne fait AUCUN inherit_id d'une vue existante -->
+    <template id="custom_login_page" name="Page de connexion personnalisée">
+
+        <html>
+            <head>
+                <meta charset="utf-8"/>
+                <meta name="viewport" content="width=device-width, initial-scale=1"/>
+                <title>Connexion - Blé d'Or</title>
+                <link rel="stylesheet" type="text/css" href="/custom_login/static/src/css/login.css"/>
+            </head>
+            <body>
+                <div class="cl-wrapper">
+                    <div class="cl-card">
+                        <div class="cl-brand">
+
+                            <div class="cl-logo">
+                                <img src="/custom_login/static/src/img/logo.jpg" alt="Logo Blé d'Or"/>
+                            </div>
+
+                            <h1>Blé d'Or</h1>
+
+                            <p>Espace de gestion - Connexion</p>
+
+                        </div>
+
+                        <t t-if="error">
+                            <div class="cl-alert cl-alert-error">
+                                <t t-esc="error"/>
+                            </div>
+                        </t>
+
+                        <form class="cl-form" role="form" t-attf-action="/web/login" method="post">
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <input type="hidden" name="redirect" t-att-value="redirect"/>
+
+                            <!-- Sélecteur de base de données, affiché seulement si plusieurs bases -->
+                            <t t-if="databases and len(databases) > 1">
+                                <div class="cl-field">
+                                    <label for="db">Base de données</label>
+                                    <select name="db" id="db">
+                                        <t t-foreach="databases" t-as="db_name">
+                                            <option t-att-value="db_name" t-att-selected="db_name == current_db">
+                                                <t t-esc="db_name"/>
+                                            </option>
+                                        </t>
+                                    </select>
+                                </div>
+                            </t>
+                            <t t-else="">
+                                <input type="hidden" name="db" t-att-value="current_db"/>
+                            </t>
+
+                            <div class="cl-field">
+                                <label for="login">Identifiant / Email</label>
+                                <input type="text" name="login" id="login" autofocus="autofocus" autocomplete="username" t-att-value="login" required="required"/>
+                            </div>
+
+                            <div class="cl-field">
+                                <label for="password">Mot de passe</label>
+                                <input type="password" name="password" id="password" autocomplete="current-password" required="required"/>
+                            </div>
+
+                            <button type="submit" class="cl-btn-submit">Se connecter</button>
+                        </form>
+
+                        <div class="cl-footer">
+                            <p>&#169; Blé d'Or - Système de gestion de production et ristournes clients</p>
+                        </div>
+                    </div>
+                </div>
+            </body>
+        </html>
+    </template>
+
+</odoo>

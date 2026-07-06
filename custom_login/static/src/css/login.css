@@ -1,0 +1,233 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    font-family: "Segoe UI", Roboto, Arial, sans-serif;
+    background: #f7fbfc;
+}
+
+
+.cl-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+
+/* Carte principale */
+.cl-card {
+
+    width: 100%;
+    max-width: 390px;
+
+    background: #ffffff;
+
+    padding: 35px 30px;
+
+    border-radius: 18px;
+
+    box-shadow:
+        0 8px 25px rgba(0,0,0,0.08);
+
+}
+
+
+
+/* Logo */
+.cl-logo {
+
+    text-align: center;
+
+    margin-bottom: 18px;
+
+}
+
+
+.cl-logo img {
+
+    width: 90px;
+    height: 90px;
+
+    object-fit: contain;
+
+}
+
+
+
+/* En-tête */
+.cl-brand {
+
+    text-align: center;
+
+    margin-bottom: 30px;
+
+}
+
+
+.cl-brand h1 {
+
+    margin: 0;
+
+    font-size: 28px;
+
+    font-weight: 700;
+
+    color: #ad9a19;
+
+}
+
+
+.cl-brand p {
+
+    margin-top: 8px;
+
+    font-size: 14px;
+
+    color: #6b7c83;
+
+}
+
+
+
+/* Message erreur */
+.cl-alert {
+
+    padding: 12px;
+
+    border-radius: 10px;
+
+    margin-bottom: 20px;
+
+    font-size: 14px;
+
+}
+
+
+.cl-alert-error {
+
+    background: #fff4d6;
+
+    color: #8f7e10;
+
+    border-left: 4px solid #ad9a19;
+
+}
+
+
+
+/* Champs */
+.cl-field {
+
+    margin-bottom: 20px;
+
+}
+
+
+.cl-field label {
+
+    display: block;
+
+    margin-bottom: 7px;
+
+    font-size: 14px;
+
+    font-weight: 500;
+
+    color: #34495e;
+
+}
+
+
+
+.cl-field input,
+.cl-field select {
+
+    width: 100%;
+
+    box-sizing: border-box;
+
+    padding: 13px 14px;
+
+    border-radius: 10px;
+
+    border: 1px solid #d9eef5;
+
+    font-size: 15px;
+
+    background: #ffffff;
+
+    transition: 0.2s ease;
+
+}
+
+
+
+.cl-field input:focus,
+.cl-field select:focus {
+
+    border-color: #5adffe;
+
+    outline: none;
+
+    box-shadow:
+        0 0 0 4px rgba(90,223,254,0.18);
+
+}
+
+
+
+/* Bouton */
+.cl-btn-submit {
+
+    width: 100%;
+
+    padding: 13px;
+
+    border: none;
+
+    border-radius: 12px;
+
+    background: #ad9a19;
+
+    color: white;
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: 0.25s ease;
+
+}
+
+
+
+.cl-btn-submit:hover {
+
+    background: #96840f;
+
+    transform: translateY(-1px);
+
+}
+
+
+
+/* Footer */
+.cl-footer {
+
+    text-align: center;
+
+    margin-top: 25px;
+
+}
+
+
+.cl-footer p {
+
+    font-size: 12px;
+
+    color: #8ca0a8;
+
+}

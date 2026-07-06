@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <template id="custom_login" name="Custom Login" t-name="web.login">
+
+        <t t-call="web.login_layout">
+
+            <div class="container">
+
+                <div class="row justify-content-center">
+
+                    <div class="col-md-5">
+
+                        <!-- Logo -->
+                        <div class="text-center mb-4">
+                            <h2 class="o_ble_dor_title">
+                                Bienvenue sur l'ERP Blé d'Or
+                            </h2>
+                        </div>
+
+
+                        <!-- Formulaire -->
+                        <form class="oe_login_form"
+                              role="form"
+                              t-attf-action="/web/login"
+                              method="post">
+
+
+                            <!-- Token CSRF -->
+                            <input type="hidden"
+                                   name="csrf_token"
+                                   t-att-value="request.csrf_token()"/>
+
+
+                            <!-- Login -->
+                            <div class="mb-3">
+                                <label for="login">
+                                    Email / Identifiant
+                                </label>
+
+                                <input type="text"
+                                       placeholder="Email"
+                                       name="login"
+                                       t-att-value="login"
+                                       id="login"
+                                       class="form-control"
+                                       required="required"
+                                       autofocus="autofocus"/>
+                            </div>
+
+
+                            <!-- Mot de passe -->
+                            <div class="mb-3">
+
+                                <label for="password">
+                                    Mot de passe
+                                </label>
+
+                                <input type="password"
+                                       placeholder="Mot de passe"
+                                       name="password"
+                                       id="password"
+                                       class="form-control"
+                                       required="required"/>
+                            </div>
+
+
+                            <!-- Message erreur -->
+                            <p class="alert alert-danger"
+                               t-if="error">
+                                <t t-esc="error"/>
+                            </p>
+
+
+                            <!-- Bouton -->
+                            <button type="submit"
+                                    class="btn btn-primary w-100">
+                                Connexion
+                            </button>
+
+
+                            <!-- Base de données cachée -->
+                            <input type="hidden"
+                                   name="db"
+                                   t-att-value="request.session.db"/>
+
+
+                        </form>
+
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+        </t>
+
+    </template>
+
+
+</odoo>
