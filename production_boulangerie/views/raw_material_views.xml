@@ -1,66 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-<!--  
+  <!--  
          VUE FORMULAIRE : raw.material
            -->
-<record id="view_raw_material_form" model="ir.ui.view">
-<field name="name">raw.material.form</field>
-<field name="model">raw.material</field>
-<field name="arch" type="xml">
-<form string="Matiere Premiere">
-<sheet>
-<div class="oe_title">
-<h1>
-<field name="name" placeholder="Nom de la matiere premiere"/>
-</h1>
-</div>
-<group string="Identification">
-<group>
-<field name="unite_mesure" string="Unite de mesure"/>
-</group>
-<group>
-<field name="standard_price" string="Prix d achat unitaire"/>
-<field name="stock_minimum" string="Stock minimum"/>
-<field name="qty_available" string="Quantite en Stock"/>
+  <record id="view_raw_material_form" model="ir.ui.view">
+    <field name="name">raw.material.form</field>
+    <field name="model">raw.material</field>
+    <field name="arch" type="xml">
+      <form string="Matiere Premiere">
+        <sheet>
+          <div class="oe_title">
+            <h1>
+              <field name="name" placeholder="Nom de la matiere premiere"/>
+            </h1>
+          </div>
+          <group string="Identification">
+            <group>
+              <field name="unite_mesure" string="Unite de mesure"/>
+            </group>
+            <group>
+              <field name="standard_price" string="Prix d achat unitaire"/>
+              <field name="stock_minimum" string="Stock minimum"/>
+              <field name="qty_available" string="Quantite en Stock"/>
 
-</group>
-</group>
-<group string="Description">
-<field name="description" nolabel="1" placeholder="Description de la matiere premiere..."/>
-</group>
-</sheet>
-</form>
-</field>
-</record>
-<!--  
+            </group>
+          </group>
+          <group string="Description">
+            <field name="description" nolabel="1" placeholder="Description de la matiere premiere..."/>
+          </group>
+        </sheet>
+      </form>
+    </field>
+  </record>
+  <!--  
          VUE LISTE : raw.material
            -->
-<record id="view_raw_material_list" model="ir.ui.view">
-<field name="name">raw.material.list</field>
-<field name="model">raw.material</field>
-<field name="arch" type="xml">
-<list string="Matieres Premieres" >
-<field name="name" string="Designation"/>
-<field name="unite_mesure" string="Unite"/>
-<field name="standard_price" string="Prix achat"/>
-<field name="stock_minimum" string="Stock min."/>
-<field name="stock_actuel" string="Stock actuel"/>
-</list>
-</field>
-</record>
-<!--  
+  <record id="view_raw_material_list" model="ir.ui.view">
+    <field name="name">raw.material.list</field>
+    <field name="model">raw.material</field>
+    <field name="arch" type="xml">
+      <list string="Matieres Premieres">
+        <field name="name" string="Designation"/>
+        <field name="unite_mesure" string="Unite"/>
+        <field name="standard_price" string="Prix achat"/>
+        <field name="stock_minimum" string="Stock min."/>
+        <field name="stock_actuel" string="Stock actuel"/>
+      </list>
+    </field>
+  </record>
+  <!--  
          ACTION
            -->
-<record id="action_raw_material" model="ir.actions.act_window">
-<field name="name">Matieres Premieres</field>
-<field name="res_model">raw.material</field>
-<field name="view_mode">list,form</field>
-<field name="help" type="html">
-<p class="o_view_nocontent_smiling_face"> Ajouter votre premiere matiere premiere </p>
-<p> Les matieres premieres sont utilisees dans le bordereau de consommation de chaque bon de production. </p>
-</field>
-</record>
-<!--  
+  <record id="action_raw_material" model="ir.actions.act_window">
+    <field name="name">Matieres Premieres</field>
+    <field name="res_model">raw.material</field>
+    <field name="view_mode">list,form</field>
+    <field name="help" type="html">
+      <p class="o_view_nocontent_smiling_face"> Ajouter votre premiere matiere premiere </p>
+      <p> Les matieres premieres sont utilisees dans le bordereau de consommation de chaque bon de production. </p>
+    </field>
+  </record>
+  <!--  
          MENU
            -->
 

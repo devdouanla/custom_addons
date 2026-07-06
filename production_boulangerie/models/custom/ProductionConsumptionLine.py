@@ -116,31 +116,41 @@ class ProductionConsumptionLine(models.Model):
                     line.production_id.name or line.production_id.display_name or _("(nouvelle)")
                 )
                 )
+            
+ # ── Verrouillage : bordereau de consommation approuvé ────────────────────
+
+       # ── Verrouillage : bordereau de consommation approuvé ────────────────────
+ 
+    def _check_bordereau_not_locked(self, production=None):
+        """Lève une erreur si le bordereau de consommation est verrouillé :
+        soit parce que la production est déjà validée ('done'), soit parce
+        que le bordereau a été explicitement approuvé."""
+        productions = production or self.mapped('production_id')
+        for prod in productions:
+            if prod.state == 'done':
+                raise UserError((
+                    "Impossible de modifier une ligne d'une production déjà validée ('%s')."
+                ) % prod.name)
+            if prod.validerBordereauConsommation:
+                raise UserError((
+                    "Le bordereau de consommation de '%s' a été approuvé : "
+                    "il n'est plus possible de le modifier."
+                ) % prod.name)
+ 
     @api.model_create_multi
     def create(self, vals_list):
+        Production = self.env['production.production']
         for vals in vals_list:
             production_id = vals.get('production_id')
             if production_id:
-                production = self.env['production.production'].browse(production_id)
-                if production.state == 'done':
-                    raise UserError((
-                        "Impossible d'ajouter une ligne à une production déjà validée."
-                    ))
+                self._check_bordereau_not_locked(Production.browse(production_id))
         return super().create(vals_list)
-
+ 
     def write(self, vals):
-        for line in self:
-            if line.production_id.state == 'done':
-                raise UserError((
-                    "Impossible de modifier une ligne d'une production déjà validée."
-                ))
+        self._check_bordereau_not_locked()
         return super().write(vals)
-
+ 
     def unlink(self):
-        for line in self:
-            if line.production_id.state == 'done':
-                raise UserError((
-                    "Impossible de supprimer une ligne d'une production déjà validée."
-                ))
+        self._check_bordereau_not_locked()
         return super().unlink()
-                
+ 

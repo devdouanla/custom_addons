@@ -16,6 +16,7 @@
         name="Configuration"
         parent="menu_bakery_root"
         sequence="10"
+        groups="group_boulangerie_responsable_production,group_boulangerie_responsable_stock,group_boulangerie_gestionnaire,group_boulangerie_directeur"
     />
 <menuitem id="menu_production_dashboard" name="Tableau de Bord" parent="menu_bakery_root" action="action_production_dashboard" sequence="1"/>
 

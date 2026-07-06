@@ -1,137 +1,155 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-<record id="view_production_production_form" model="ir.ui.view">
-<field name="name">production.production.form</field>
-<field name="model">production.production</field>
-<field name="arch" type="xml">
-<form string="Bon de Production">
-<header>
-<button name="action_validate" string="Valider" type="object" class="btn-primary" invisible="state != 'draft'" confirm="Confirmer la validation ? Des mouvements de stock seront crees."/>
-<button name="action_cancel" string="Annuler" type="object" invisible="state == 'done'"/>
-<button name="action_reset_draft" string="Remettre en brouillon" type="object" invisible="state != 'cancelled'"/>
-<button name="action_view_stock_moves" string="Mouvements de stock" type="object" class="btn-info" invisible="stock_move_count == 0"/>
-<field name="state" widget="statusbar" statusbar_visible="draft,done,cancelled"/>
-</header>
-<sheet>
-<div class="oe_button_box" name="button_box">
-<button name="action_view_stock_moves" type="object" class="oe_stat_button" icon="fa-exchange" invisible="stock_move_count == 0">
-<field name="stock_move_count" widget="statinfo" string="Mouvements"/>
-</button>
-</div>
-<div class="oe_title">
-<h1>
-<field name="name" readonly="1" placeholder="Reference auto"/>
-</h1>
-</div>
-<field name="currency_id" invisible="1"/>
-<group string="Informations generales">
-<group>
-<field name="production_date" options="{'no_create': True}" readonly="True"/>
-<field name="responsable_id" string="Responsable de production" options="{'no_create': True}" readonly="state != 'draft'"/>
-</group>
-<group>
-<field name="location_id" string="Emplacement de destination" options="{'no_create': True}" readonly="True" />
-</group>
-<group>
+    <record id="view_production_production_form" model="ir.ui.view">
+        <field name="name">production.production.form</field>
+        <field name="model">production.production</field>
+        <field name="arch" type="xml">
+            <form string="Fiche de Production">
+                <header>
+                    <button name="action_soumettre" string="Soumettre" type="object" class="btn-primary" invisible="state != 'ondoing'" confirm="Confirmer la soumission ? il sera impossible de modifier les bordereaux après soumission." groups="production_boulangerie.group_boulangerie_chef_equipe"/>
+                    <button name="action_validate" string="Valider" type="object" class="btn-primary" invisible="state != 'waiting'" confirm="Confirmer la validation ? Des mouvements de stock seront créés." groups="production_boulangerie.group_boulangerie_gestionnaire"/>
+                    <button name="action_cancel" string="Annuler" type="object" invisible="state in ('done', 'cancelled')" groups="production_boulangerie.group_boulangerie_gestionnaire"/>
+                    <button name="action_reset_draft" string="Remettre en brouillon" type="object" invisible="state != 'cancelled'" groups="production_boulangerie.group_boulangerie_gestionnaire"/>
+                    <button name="action_view_stock_moves" string="Mouvements de stock" type="object" class="btn-info" invisible="stock_move_count == 0" groups="production_boulangerie.group_boulangerie_gestionnaire"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,ondoing,waiting,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_stock_moves" type="object" class="oe_stat_button" icon="fa-exchange" invisible="stock_move_count == 0" groups="production_boulangerie.group_boulangerie_gestionnaire">
+                            <field name="stock_move_count" widget="statinfo" string="Mouvements"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1" placeholder="Référence auto"/>
+                        </h1>
+                    </div>
+                    <field name="currency_id" invisible="1"/>
+                    <group string="Informations générales">
+                        <group>
+                            <field name="production_date" options="{'no_create': True}" readonly="1"/>
+                            <field name="responsable_id" string="Chef d'équipe" options="{'no_create': True}"/>
+                        </group>
+                        <group>
+                            <field name="location_id" string="Type de production" options="{'no_create': True}" readonly="1"/>
+                            <field name="validerBordereauProduction" readonly="1"/>
+                            <field name="validerBordereauConsommation" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Indicateurs de rentabilité">
+                        <group>
+                            <field name="production_value" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="consumption_cost" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                        </group>
+                        <group>
+                            <field name="profit" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="profit_rate" string="Taux de profit (%)"/>
+                        </group>
+                    </group>
+                    <group string="Indicateurs matières premières">
+                        <group>
+                            <field name="farine_product_id" options="{'no_create': True}"/>
+                            <field name="unite_mesure_farine_product" string="Unité de base"/>
+                            <field name="farine_quantity"/>
+                        </group>
+                        <group>
+                            <field name="display_uom_id" string="Unité de mesure"/>
+                            <field name="production_value_per_bag" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="profit_per_bag" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Bordereau de Production" name="page_production">
+                            <field name="sheet_line_ids" nolabel="1" readonly="validerBordereauProduction">
+                                <list editable="bottom" string="Produits finis fabriqués">
+                                    <field name="product_id" string="Produit fini" options="{'no_create': True}" domain="[('id', 'not in', parent.used_finished_product_ids)]"/>
+                                    <field name="quantity" string="Quantité produite"/>
+                                    <field name="wholesale_price" string="Prix de gros"/>
+                                    <field name="amount" string="Montant" readonly="1" sum="Total production"/>
+                                </list>
+                            </field>
+                            <group class="oe_subtotal_footer oe_left">
+                                <button name="action_approve_bordereau_production" string="Approuver bordereau production" type="object" class="btn-secondary" invisible="state != 'ondoing' or validerBordereauProduction" confirm="Confirmer l'approbation ? Le bordereau de production ne sera plus modifiable." groups="production_boulangerie.group_boulangerie_responsable_production"/>
+                                <button name="action_reopen_bordereau_production" string="Rouvrir bordereau production" type="object" invisible="state != 'ondoing' or not validerBordereauProduction" confirm="Rouvrir le bordereau de production pour modification ?" groups="production_boulangerie.group_boulangerie_responsable_production"/>
+                            </group>
+                            <group class="oe_subtotal_footer oe_right">
+                                <field name="production_value" string="TOTAL PRODUCTION" widget="monetary" options="{'currency_field': 'currency_id'}" readonly="1" class="oe_subtotal_footer_separator"/>
+                            </group>
 
+                        </page>
+                        <page string="Bordereau Matières Premières" name="page_consumption">
+                            <field name="consumption_line_ids" nolabel="1" readonly="validerBordereauConsommation">
+                                <list editable="bottom" string="Matières premières consommées">
+                                    <field name="product_id" string="Matière première" options="{'no_create': True}" domain="[('id', 'not in', parent.used_raw_material_ids)]"/>
+                                    <field name="opening_stock" string="Stock initial"/>
+                                    <field name="standard_price" string="Prix achat"/>
+                                    <field name="closing_stock" string="Stock final"/>
+                                    <field name="consumption" string="Consommation" readonly="1"/>
+                                    <field name="consumption_cost" string="Coût" readonly="1" sum="Coût total MP"/>
+                                </list>
+                            </field>
+                            <group class="oe_subtotal_footer oe_left">
+                                <button name="action_approve_bordereau_consommation" string="Approuver bordereau consommation" type="object" class="btn-secondary" invisible="state != 'ondoing' or validerBordereauConsommation" confirm="Confirmer l'approbation ? Le bordereau de consommation ne sera plus modifiable." groups="production_boulangerie.group_boulangerie_responsable_stock"/>
+                                <button name="action_reopen_bordereau_consommation" string="Rouvrir bordereau consommation" type="object" invisible="state != 'ondoing' or not validerBordereauConsommation" confirm="Rouvrir le bordereau de consommation pour modification ?" groups="production_boulangerie.group_boulangerie_responsable_stock"/>
+                            </group>
+                            <group class="oe_subtotal_footer oe_right">
+                                <field name="consumption_cost" string="COÛT TOTAL MATIÈRES" widget="monetary" options="{'currency_field': 'currency_id'}" readonly="1" class="oe_subtotal_footer_separator"/>
+                            </group>
+                        </page>
+                        <page string="Notes" name="page_notes">
+                            <field name="notes" placeholder="Observations..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+    <record id="view_production_production_list" model="ir.ui.view">
+        <field name="name">production.production.list</field>
+        <field name="model">production.production</field>
+        <field name="arch" type="xml">
+            <list string="Productions" decoration-success="state == 'done'" decoration-muted="state == 'cancelled'" decoration-info="state == 'draft'">
+                <field name="name" string="Référence"/>
+                <field name="production_date" string="Jour de production"/>
+                <field name="responsable_id" string="Responsable"/>
+                <field name="production_value" string="Valeur prod." widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="consumption_cost" string="Coût MP" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="profit" string="Profit" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="profit_rate" string="Taux (%)"/>
+                <field name="validerBordereauProduction" string="Prod. approuvée" widget="boolean_toggle" optional="hide"/>
+                <field name="validerBordereauConsommation" string="Conso. approuvée" widget="boolean_toggle" optional="hide"/>
+                <field name="state" widget="badge" decoration-success="state == 'done'" decoration-warning="state == 'draft'" decoration-danger="state == 'cancelled'"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_production_production_search" model="ir.ui.view">
+        <field name="name">production.production.search</field>
+        <field name="model">production.production</field>
+        <field name="arch" type="xml">
+            <search string="Rechercher une production">
+                <field name="name" string="Référence"/>
+                <field name="production_day_id" string="Jour"/>
+                <!--
+<filter string="Bordereau production approuvé" name="filter_valide_prod" domain="[('validerBordereauProduction', '=', True)]"/>
+<filter string="Bordereau consommation approuvé" name="filter_valide_conso" domain="[('validerBordereauConsommation', '=', True)]"/>
+<filter string="En cours" name="filter_ondoing" domain="[('state', '=', 'ondoing')]"/>
+<filter string="En attente" name="filter_waiting" domain="[('state', '=', 'waiting')]"/>
+<filter string="Validées" name="filter_done" domain="[('state', '=', 'done')]"/>
+<group expand="0" string="Grouper par">
+<filter string="État" name="groupby_state" context="{'group_by': 'state'}"/>
 </group>
-</group>
-<group string="Indicateurs de rentabilite">
-<group>
-<field name="production_value" widget="monetary" options="{'currency_field': 'currency_id'}"/>
-<field name="consumption_cost" widget="monetary" options="{'currency_field': 'currency_id'}"/>
-</group>
-<group>
-<field name="profit" widget="monetary" options="{'currency_field': 'currency_id'}"/>
-<field name="profit_rate" string="Taux de profit (%)"/>
-</group>
-</group>
-<group string="Indicateurs matières  premières">
-<group>
-<field name="farine_product_id" options="{'no_create': True}" readonly="state != 'draft'"/>
-<field name="unite_mesure_farine_product" string="Unité de base" />
-<field name="farine_quantity" readonly="state != 'draft'"/>
-</group>
-<group>
-<field name="display_uom_id" string="Unité de mesure" />
-
-<field name="production_value_per_bag" widget="monetary" options="{'currency_field': 'currency_id'}"/>
-<field name="profit_per_bag" widget="monetary" options="{'currency_field': 'currency_id'}"/>
-
-</group>
-</group>
-<notebook>
-<page string="Bordereau de Production" name="page_production">
-<field name="sheet_line_ids" nolabel="1" readonly="state != 'draft'">
-<list editable="bottom" string="Produits finis fabriques">
-<field name="product_id" string="Produit fini" options="{'no_create': True}" domain="[('id', 'not in', parent.used_finished_product_ids)]"/>
-<field name="quantity" string="Quantite produite"/>
-<field name="wholesale_price" string="Prix de gros"/>
-<field name="amount" string="Montant" readonly="1" sum="Total production"/>
-</list>
-</field>
-<group class="oe_subtotal_footer oe_right">
-<field name="production_value" string="TOTAL PRODUCTION" widget="monetary" options="{'currency_field': 'currency_id'}" readonly="1" class="oe_subtotal_footer_separator"/>
-</group>
-</page>
-<page string="Bordereau Matieres Premieres" name="page_consumption">
-<field name="consumption_line_ids" nolabel="1" readonly="state != 'draft'">
-<list editable="bottom" string="Matieres premieres consommees">
-<field name="product_id" string="Matiere premiere" options="{'no_create': True}"  domain="[('id', 'not in', parent.used_raw_material_ids)]"/>
-<field name="opening_stock" string="Stock initial"/>
-<field name="standard_price" string="Prix achat"/>
-
-<field name="closing_stock" string="Stock final"/>
-<field name="consumption" string="Consommation" readonly="1"/>
-<field name="consumption_cost" string="Cout" readonly="1" sum="Cout total MP"/>
-</list>
-</field>
-<group class="oe_subtotal_footer oe_right">
-<field name="consumption_cost" string="COUT TOTAL MATIERES" widget="monetary" options="{'currency_field': 'currency_id'}" readonly="1" class="oe_subtotal_footer_separator"/>
-</group>
-</page>
-<page string="Notes" name="page_notes">
-<field name="notes" placeholder="Observations..." readonly="state == 'done'"/>
-</page>
-</notebook>
-</sheet>
-<chatter/>
-</form>
-</field>
-</record>
-<record id="view_production_production_list" model="ir.ui.view">
-<field name="name">production.production.list</field>
-<field name="model">production.production</field>
-<field name="arch" type="xml">
-<list string="Productions" decoration-success="state == 'done'" decoration-muted="state == 'cancelled'" decoration-info="state == 'draft'">
-<field name="name" string="Reference"/>
-<field name="production_date" string="Jour de production"/>
-<field name="responsable_id" string="Responsable"/>
-<field name="production_value" string="Valeur prod." widget="monetary" options="{'currency_field': 'currency_id'}"/>
-<field name="consumption_cost" string="Cout MP" widget="monetary" options="{'currency_field': 'currency_id'}"/>
-<field name="profit" string="Profit" widget="monetary" options="{'currency_field': 'currency_id'}"/>
-<field name="profit_rate" string="Taux (%)"/>
-<field name="state" widget="badge" decoration-success="state == 'done'" decoration-warning="state == 'draft'" decoration-danger="state == 'cancelled'"/>
-</list>
-</field>
-</record>
-<record id="view_production_production_search" model="ir.ui.view">
-<field name="name">production.production.search</field>
-<field name="model">production.production</field>
-<field name="arch" type="xml">
-<search string="Rechercher une production">
-<field name="name" string="Reference"/>
-<field name="production_day_id" string="Jour"/>
-</search>
-</field>
-</record>
-<record id="action_production_production" model="ir.actions.act_window">
-<field name="name">Productions</field>
-<field name="res_model">production.production</field>
-<field name="view_mode">list,form</field>
-<field name="search_view_id" ref="view_production_production_search"/>
-<field name="help" type="html">
-<p class="o_view_nocontent_smiling_face">Creer votre premiere production</p>
-</field>
-</record>
+-->
+            </search>
+        </field>
+    </record>
+    <record id="action_production_production" model="ir.actions.act_window">
+        <field name="name">Productions</field>
+        <field name="res_model">production.production</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_production_production_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Créer votre première production</p>
+        </field>
+    </record>
 </odoo>

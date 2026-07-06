@@ -12,23 +12,23 @@
                     <!-- Informations générales -->
                     <group string="Informations Générales">
                         <group>
-                            <field name="date"/>
+                            <field name="date" groups="production_boulangerie.group_boulangerie_responsable_production" />
                             <field name="reference"/>
                             <!--<field name="state"/>-->
-                             <field name="type_production_id" string="type de production"/>
+                            <field name="type_production_id" string="type de production" groups="production_boulangerie.group_boulangerie_responsable_production" />
                         </group>
                     </group>
 
                     <!-- One2many -->
 
-                   <group string="Liste des fiches de production">
+                    <group string="Liste des fiches de production">
 
-                         <field name="production_ids" string="Production" nolabel="1">
+                        <field name="production_ids" string="Production" nolabel="1">
                             <!--<list editable="bottom">
                                 <field name="name"/>
                             </list>-->
                         </field>
-                    </group> 
+                    </group>
 
                 </sheet>
             </form>
@@ -42,9 +42,9 @@
         <field name="model">production.day</field>
         <field name="arch" type="xml">
             <list string="Journées de Production">
-            <field name="reference" />
-                
-               <field name="type_production_name" string="type de production"/>
+                <field name="reference" />
+
+                <field name="type_production_name" string="type de production"/>
                 <field name="date"/>
                 <!-- <field name="state"/>-->
             </list>
